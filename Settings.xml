@@ -1,0 +1,4 @@
+<Settings>
+  <Setting  id="TestSetting">Value of Setting</Setting>
+  <Setting  id="TestSetting2">Value of Setting2</Setting>
+</Settings>
