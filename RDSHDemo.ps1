@@ -1,4 +1,4 @@
-﻿#$secPwd = "C1!ff0rd" | ConvertTo-SecureString -AsPlainText -Force
+﻿#$secPwd = "pwdHere" | ConvertTo-SecureString -AsPlainText -Force
 #$cred = New-Object System.Management.Automation.PSCredential ("cliff@wws5.com", $secPwd)
 #Login-AzureRmAccount -Credential $cred -SubscriptionName "Visual Studio Enterprise – MPN"
 
