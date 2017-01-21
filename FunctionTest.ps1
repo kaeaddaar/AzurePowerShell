@@ -1,7 +1,7 @@
 ﻿#Functions-Common.ps1 needs to be run to create the global functions
 # Logon
 # getEnumResourceGroup
-cls
+Clear-Host
 Write-Host ----- Welcome to the Function Test Powershell Application -----
 Write-Host
 logon
