@@ -1,4 +1,4 @@
-﻿
+﻿# Author: Clifford MacKay
 # ----- Logon -----
 
 function global:Logon
