@@ -99,8 +99,8 @@ Function global:New-cmVNet
         [Parameter(Mandatory=$true)] [String]$RGName, 
         [Parameter(Mandatory=$true)] [String]$VNetName, 
         [Parameter(Mandatory=$true)] [String]$SubnetName, 
-        [String]$VNetAddressPrefix = "10.0.0.0/16", 
-        [String]$SubnetAddressPrefix = "10.0.0.0/24",
+        [String]$VNetAddressPrefix = "10.0.2.0/16", 
+        [String]$SubnetAddressPrefix = "10.0.2.0/24",
         [String]$RGLoc = "westus2"
     )
     
@@ -160,8 +160,10 @@ $RgNIC = New-AzureRmNetworkInterface -Name "cmPSNIC" -ResourceGroupName $RGName 
 
 }
 
+
 # ----- CNull ----- Purpose: If null initialize to a value (need to test)
 Function global:CNull($Anything, $ValueIfNull) { if ($Anything -eq $null) { $Anything = $ValueIfNull } else { $false } }
+
 # ----- NB ----- Purpose: Break on null
 Function global:NB ($Anything, $Message = "Breaking") { if ($Anything -eq $null) 
 { Write-Host $Message
