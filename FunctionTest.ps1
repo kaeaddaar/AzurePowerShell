@@ -13,6 +13,7 @@ logon
 
 #Write-Host "Please enter a step to skip to, or hit enter to continue"
 #$StepNum = Read-Host
+$ErrorActionPreference = "stop"
 
     #The following test shows how to get the ResourceGroupChosen
     [Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup]$RG = Get-cmEnumResourceGroup
@@ -37,60 +38,35 @@ Write-Host "Load Balancer begin"
 
 # ----- Create a Load Balancer ----- begin
 # https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-get-started-internet-arm-ps
+$InputX = @{
+    "FrontEndIpName" = "cmPsFrontEndIp"
+    "FrontEndPrivateIp" = "10.0.0.5"
+    "BackEndIpName" = "cmPsBackEndIp"
+    "InboundNatRuleName1" = "cmPsInboundNatRdp1"
+    "Inbound1FrontPort" = 3441
+    "InboundNatRuleName2" = "cmPsInboundNatRdp2"
+    "Inbound2FrontPort" = 3442
+    "BackEndPort" = 3389
+    "InboundProtocol" = "Tcp"
+    "HealthProbeName" = "cmPsHealthProbe"
+    "HealthProbeRequestPath" = "./"
+    "HealthProbeProtocol" = "http"
+    "HealthProbePort" = 80
+    "HealthProbeIntervalInSeconds" = 15
+    "HealthProbeProbeCount" = 2
+    "LoadBalancerName" = "cmPsLoadBalancer"
+    "LoadBalanceRuleName" = "cmPsLoadBalanceRule"
+    "LoadBalanceProtocol" = "Tcp"
+    "LoadBalanceFrontEndPort" = 80
+    "LoadBalanceBackEndPort" = 80
+    "BackEndNic1Name" = "cmpsbackendnic1"
+    "BackEndPrivateIp1" = "10.0.0.6"
+    "BackEndNic2Name" = "cmpsbackendnic2"
+    "BackEndPrivateIp2" = "10.0.0.7"
+}
 
-$FrontEndIpName = "cmPsFrontEndIp"
-$FrontEndPrivateIp = "10.0.0.5"
-Write-Host '$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig ...'
-$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig -Name $FrontEndIpName -PrivateIpAddress $FrontEndPrivateIp -SubnetId $RGVnet.subnets[0].Id
+$RGLoadBalancer = New-cmLoadBalancer -RGName $RG.ResourceGroupName -RGVnet $RGVnet -InputX $InputX
 
-$BackEndIpName = "cmPsBackEndIp"
-Write-host '$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig ...'
-$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig -Name $BackEndIpName
-
-$InboundNatRuleName1 = "cmPsInboundNatRdp1"
-$Inbound1FrontPort = 3441 
-$InboundNatRuleName2 = "cmPsInboundNatRdp2"
-$Inbound2FrontPort = 3442
-$BackEndPort = 3389
-$InboundProtocol = "Tcp"
-Write-Host '$RGInboundNatRule1 = New-AzureRmLoadBalancerInboundNatRuleConfig ...'
-$RGInboundNatRule1 = New-AzureRmLoadBalancerInboundNatRuleConfig -Name $InboundNatRuleName1 -FrontendIpConfiguration $RGFrontEndIp -Protocol $InboundProtocol -FrontendPort $Inbound1FrontPort -BackendPort $BackEndPort
-WRite-host '$RGInboundNatRule2 = New-AzureRmLoadBalancerInboundNatRuleConfig ...'
-$RGInboundNatRule2 = New-AzureRmLoadBalancerInboundNatRuleConfig -Name $InboundNatRuleName2 -FrontendIpConfiguration $RGFrontEndIp -Protocol $InboundProtocol -FrontendPort $Inbound2FrontPort -BackendPort $BackEndPort
-
-$HealthProbeName = "cmPsHealthProbe"
-$HealthProbeRequestPath = "./"
-$HealthProbeProtocol = "http"
-$HealthProbePort = 80
-$HealthProbeIntervalInSeconds = 15
-$HealthProbeProbeCount = 2
-$LoadBalanceRuleName = "cmPsLoadBalanceRule"
-$LoadBalanceProtocol = "Tcp"
-$LoadBalanceFrontEndPort = 80
-$LoadBalanceBackEndPort = 80
-write-host '$RGHealthProbe = New-AzureRmLoadBalancerProbeConfig'
-$RGHealthProbe = New-AzureRmLoadBalancerProbeConfig -Name $HealthProbeName -RequestPath $HealthProbeRequestPath -Protocol $HealthProbeProtocol -Port $HealthProbePort -IntervalInSeconds $HealthProbeIntervalInSeconds -ProbeCount $HealthProbeProbeCount
-Write-Host '$RGLoadBalanceRule = New-AzureRmLoadBalancerRuleConfig'
-$RGLoadBalanceRule = New-AzureRmLoadBalancerRuleConfig -Name $LoadBalanceRuleName -FrontendIpConfiguration $RGFrontEndIp -BackendAddressPool $RGBackEndAddressPool -Probe $RGHealthProbe -Protocol $LoadBalanceProtocol -FrontendPort $LoadBalanceFrontEndPort -BackendPort $LoadBalanceBackEndPort
-
-$LoadBlancerName = "cmPsLoadBalancer"
-write-host '$RGLoadBalancer = New-AzureRmLoadBalancer ...'
-$RGLoadBalancer = New-AzureRmLoadBalancer -ResourceGroupName $Rg.ResourceGroupName -Name $LoadBlancerName -Location $locName -FrontendIpConfiguration $RGFrontEndIp -InboundNatRule $RGInboundNatRule1 -BackendAddressPool $RGBackEndAddressPool -Probe $RGHealthProbe
-
-#$VnetBackEndSubnetName = "cmpsbackendsubnet"
-$VnetBackEndSubnetName = $SubnetName
-Write-Host '$RGBackEndSubnet = Get-AzureRmVirtualNetworkSubnetConfig ...'
-$RGBackEndSubnet = Get-AzureRmVirtualNetworkSubnetConfig -Name $VnetBackEndSubnetName -VirtualNetwork $RGVnet
-$BackEndNic1Name = "cmpsbackendnic1"
-$BackEndPrivateIp1 = "10.0.0.6"
-Write-Host '$RGBackEndNic1 = New-AzureRmNetworkInterface ...'
-$RGBackEndNic1 = New-AzureRmNetworkInterface -ResourceGroupName $RG.ResourceGroupName -Name $BackEndNic1Name -Location $locName -PrivateIpAddress $BackEndPrivateIp1 -Subnet $RGBackEndSubnet -LoadBalancerBackendAddressPool $RGLoadBalancer.BackendAddressPools[0] -LoadBalancerInboundNatRule $RGLoadBalancer.InboundNatRules[0]
-$BackEndNic2Name = "cmpsbackendnic2"
-$BackEndPrivateIp2 = "10.0.0.7"
-Write-Host '$RGBackEndNic1 = New-AzureRmNetworkInterface ...'
-$RGBackEndNic1 = New-AzureRmNetworkInterface -ResourceGroupName $RG.ResourceGroupName -Name $BackEndNic2Name -Location $locName -PrivateIpAddress $BackEndPrivateIp2 -Subnet $RGBackEndSubnet -LoadBalancerBackendAddressPool $RGLoadBalancer.BackendAddressPools[0] -LoadBalancerInboundNatRule $RGLoadBalancer.InboundNatRules[1]
-
-$RGBackEndNic1
 # ----- Create a Load Balancer ----- end
 
 
@@ -115,8 +91,7 @@ $myVm = Set-AzureRmVMOperatingSystem -VM $myVm -Windows -ComputerName $vmName -C
 $myVm = Set-AzureRmVMSourceImage -VM $myVm -PublisherName "MicrosoftWindowsServer" -Offer "WindowsServer" -Skus "2016-Datacenter" -Version "latest"
 
 # 5. Add the network interface that you created to the configuration.
-# Trying to use load balancer as network interface
-#$myVm = Add-AzureRmVMNetworkInterface -vm $myVm -id $RGLoadBalancer.Id
+
 $myVm = Add-AzureRmVMNetworkInterface -vm $myVm -id $RGBackEndNic1.Id
 
 # 6. Define the name and location of the VM hard disk. The virtual hard disk file is stored in a container. This command creates the disk in a container named vhds/myOsDisk1.vhd in the storage account that you created.
@@ -130,5 +105,31 @@ $myVm = Set-AzureRmVMOSDisk -VM $myVm -Name "myOsDisk1" -VhdUri $osDiskUri -Crea
 new-azureRmVm -ResourceGroupName $RG.ResourceGroupName -Location $locName -VM $myVm 
 # ----- Create a virtual machine ----- end
 
+# Next step is to add the second vm to the second nic, and then scale the code to work for n instances.
 
 Write-Host "Done."
+# SIG # Begin signature block
+# MIIEMwYJKoZIhvcNAQcCoIIEJDCCBCACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
+# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU0M614FOrQXI0UwV+NW6K4zsu
+# 3wigggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
+# MCwxKjAoBgNVBAMTIVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdDAe
+# Fw0xNzAyMDkxNzU3NDBaFw0zOTEyMzEyMzU5NTlaMBoxGDAWBgNVBAMTD1Bvd2Vy
+# U2hlbGwgVXNlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAxJMXSX2yDza4
+# YoV7fYGLG+XE5KuXS17haubcZNNb85RbiguXlg8mOViEUalyEcEPdY5xfR1b62K7
+# Jt3J82RlEfwnVtmin5EXW3hYOYRP87U/pkKiq1MHULcmKO2kReTQmMtJB7Lw7HMB
+# g7bsaQzkOqzbgL38cMaowb/Kjo+VR+MCAwEAAaN2MHQwEwYDVR0lBAwwCgYIKwYB
+# BQUHAwMwXQYDVR0BBFYwVIAQO7kzIfSp327hSz/mt29jcKEuMCwxKjAoBgNVBAMT
+# IVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdIIQrgjaQlc+9IhF3X9o
+# nylYgTAJBgUrDgMCHQUAA4GBAAy7KZBYUA9VbxygZSoCQVZnjgDjcu5tmHnWxqhD
+# OS2ZuMoMH38IO1D9fgqc2dvSANyVtvZ9KLPZcBvbos1yprogGvAIHZ5S2LEHvE1f
+# cB8ygMkqEmCddMeT7nJx0rU5wUaG8FMB44nA676kC33HIabLVc1CQq7oU0JbR5BO
+# j8IcMYIBYDCCAVwCAQEwQDAsMSowKAYDVQQDEyFQb3dlclNoZWxsIExvY2FsIENl
+# cnRpZmljYXRlIFJvb3QCEF6p4BzLRSWQS77SgeZDGJswCQYFKw4DAhoFAKB4MBgG
+# CisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcC
+# AQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYE
+# FLx90Arp/qzcm/DKX9D1UiloWSjuMA0GCSqGSIb3DQEBAQUABIGAMFmgIhsZZwEA
+# 9RN/4TrIssDEmaPrzi7r7h8syOTv/IDB860y1RyYe5ZnzmbseK2qd4rVzC25HsE3
+# DBq6VgeMp2xh2Z+ZST2fx0t6AwSHYiLa2i37e8io4Znrl8o+QmAxofNLiD2NO0et
+# 3e6lv06ixEdPs6Ibd/snjtwDyOQDUp4=
+# SIG # End signature block
