@@ -90,11 +90,18 @@ Function set-stuff{
         }
     }
 
+# Getting access to Windward Registry Keys, and values
+Get-ChildItem -path 'HKCU:\SOFTWARE\Windward\System Five\' | Select-Object #Name and Property. I should check out the view to see how they did the name to just c:\...
+Get-ChildItem -path 'HKCU:\SOFTWARE\Windward\System Five\' | Select-Object -ExpandProperty Property #show the properties (property names)
+Get-ChildItem -path 'HKCU:\SOFTWARE\Windward\System Five\' | Select-Object {$_.GetValue("")} #Get company names
+Get-ChildItem -path 'HKCU:\SOFTWARE\Windward\System Five\' | Select-Object {$_.Name}
+Get-ChildItem -path "HKCU:\SOFTWARE\Windward\System Five\" | Select-Object {$_.Name.Substring(48)} #Get just the path to the data
+
 # SIG # Begin signature block
 # MIIEMwYJKoZIhvcNAQcCoIIEJDCCBCACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZoDpRhuMzh5eTBTF5pMaLSn3
-# Q36gggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUwsWMawnZ3BgWJXNVF+HqkZb1
+# DeigggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
 # MCwxKjAoBgNVBAMTIVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdDAe
 # Fw0xNzAyMDkxNzU3NDBaFw0zOTEyMzEyMzU5NTlaMBoxGDAWBgNVBAMTD1Bvd2Vy
 # U2hlbGwgVXNlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAxJMXSX2yDza4
@@ -110,8 +117,8 @@ Function set-stuff{
 # cnRpZmljYXRlIFJvb3QCEF6p4BzLRSWQS77SgeZDGJswCQYFKw4DAhoFAKB4MBgG
 # CisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcC
 # AQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYE
-# FIYccV4qYrdo0juVk3C3kv6CcSvEMA0GCSqGSIb3DQEBAQUABIGAIr6mSYCk0GyI
-# o8yn8lbAkkU2kq/OJGQLAyr94V2wJsi3OlarVHD5lMwbZBPkITz7H1xSDeIR/mxL
-# srRO0NxBL75pI1nLnQxIdGrHbv5fDz1+fxhVjlh1nggINNZ/Q8Wu6WBzybC/h+dr
-# OoXJ9ObAYmJyOSibGxI5LNuZthNKpw8=
+# FK79VuLa9Ze43FYPH8BZhWRnZHW6MA0GCSqGSIb3DQEBAQUABIGANkBlgx5XdMYo
+# I4RjlIEe71y3OX9zE9R2NpCKvhtMDLpulqPnVLNOK+bAdMI4jX/N7Qve/WW/aciA
+# rP/r1hfFv4cAdI9tMDMBmWawownRCenaI6MArJeWFEZ81/WhtRDIwpqbej5mikPc
+# GZQ2rnZmVFL382IDatjnz4qZtyXlDOM=
 # SIG # End signature block
