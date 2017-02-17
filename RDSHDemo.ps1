@@ -1,4 +1,4 @@
-﻿#$secPwd = "pwdHere" | ConvertTo-SecureString -AsPlainText -Force
+﻿ #$secPwd = "pwdHere" | ConvertTo-SecureString -AsPlainText -Force
 #$cred = New-Object System.Management.Automation.PSCredential ("cliff@wws5.com", $secPwd)
 #Login-AzureRmAccount -Credential $cred -SubscriptionName "Visual Studio Enterprise – MPN"
 
@@ -84,3 +84,29 @@ new-azurermvm -ResourceGroupName $RGName -Location $RGLoc -VM $RGVm
 #Get-AzureRMVMImageSku -Location "West US 2" -Publisher "MicrosoftWindowsServer" -Offer "WindowsServer" | Select Skus
 
 Write-Host "Done"
+
+# SIG # Begin signature block
+# MIIEMwYJKoZIhvcNAQcCoIIEJDCCBCACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
+# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUt7P+1d8qxI9movFeCDG+bAOL
+# aKOgggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
+# MCwxKjAoBgNVBAMTIVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdDAe
+# Fw0xNzAyMDkxNzU3NDBaFw0zOTEyMzEyMzU5NTlaMBoxGDAWBgNVBAMTD1Bvd2Vy
+# U2hlbGwgVXNlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAxJMXSX2yDza4
+# YoV7fYGLG+XE5KuXS17haubcZNNb85RbiguXlg8mOViEUalyEcEPdY5xfR1b62K7
+# Jt3J82RlEfwnVtmin5EXW3hYOYRP87U/pkKiq1MHULcmKO2kReTQmMtJB7Lw7HMB
+# g7bsaQzkOqzbgL38cMaowb/Kjo+VR+MCAwEAAaN2MHQwEwYDVR0lBAwwCgYIKwYB
+# BQUHAwMwXQYDVR0BBFYwVIAQO7kzIfSp327hSz/mt29jcKEuMCwxKjAoBgNVBAMT
+# IVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdIIQrgjaQlc+9IhF3X9o
+# nylYgTAJBgUrDgMCHQUAA4GBAAy7KZBYUA9VbxygZSoCQVZnjgDjcu5tmHnWxqhD
+# OS2ZuMoMH38IO1D9fgqc2dvSANyVtvZ9KLPZcBvbos1yprogGvAIHZ5S2LEHvE1f
+# cB8ygMkqEmCddMeT7nJx0rU5wUaG8FMB44nA676kC33HIabLVc1CQq7oU0JbR5BO
+# j8IcMYIBYDCCAVwCAQEwQDAsMSowKAYDVQQDEyFQb3dlclNoZWxsIExvY2FsIENl
+# cnRpZmljYXRlIFJvb3QCEF6p4BzLRSWQS77SgeZDGJswCQYFKw4DAhoFAKB4MBgG
+# CisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcC
+# AQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYE
+# FCrZmuSiZSTLncDrdyZJc7j7B1vLMA0GCSqGSIb3DQEBAQUABIGAXD5ayQ63AZf+
+# wCJU1+BUFpT34varDofQJb7M5R8aeUZVF80vRh22aM03s4BGp80K1UmPJd82KuSI
+# /8d6hX2WeeE8PJJlYC4cDon3Dqz25HF4pMkv+HtwaOhdit/VhU6rJNQVSD8K7OP7
+# Qx4AiWhzwsdzac3OrA9mQJhankL70k8=
+# SIG # End signature block
