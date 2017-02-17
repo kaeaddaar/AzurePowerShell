@@ -2,9 +2,10 @@
 
 function global:get-cmEnumResourceGroup # Returns the ResourceGroup selected
 {
-    [outputtype ([Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup])]
+    #[OutputType ([Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup])]
     Param (
-    [Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup]$RgInput
+    #[Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup]$RgInput
+    $RgInput
     )
     if($RgInput -ne $null) # if we have a good resource group then just pass it back, other code only needed if we dont have one.
     {
@@ -177,7 +178,7 @@ function global:New-PAzureRmVm
 
 }
 
-function global:Get-PAzureRmVmConfig
+function global:New-PAzureRmVmConfig
 {
     param
     (
@@ -196,6 +197,22 @@ function global:Get-PAzureRmVmConfig
 
     $VmConfig = new-azurermvmconfig -VMName $VmNameInput (Get-PVMSize $PVmSizeAuto) 
 
+}
 
 
+#Set-AzureRmVMOperatingSystem -VM $VmConfig -ComputerName -Windows -Credential $Cred
+function global:Set-PAzureRmVMOperatingSystem
+{
+    Param
+    (
+        $VmInput,
+        $ComputerNameInput,
+        $CredentialInput
+    )
+
+    if ($VmInput -eq $null) {New-PAzureRmVmConfig -VmNameInput $ComputerNameInput -PVmSizeAuto $VmSize}
+    if (CredentialInput -eq $null) {Get-Credential }
+
+    Set-AzureRmVMOperatingSystem -VM $VmInput -ComputerName $ComputerNameInput -Credential $CredentialInput -Windows
+    
 }

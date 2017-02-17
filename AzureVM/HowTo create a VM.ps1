@@ -41,7 +41,14 @@ New-AzureRmVMConfig -VMName $VmName -VMSize "Standard_A2"
 $VmConfig = new-azurermvmconfig -VMName $VmName (Get-PVMSize $PVmSize) 
 #New-AzureRmVmConfig ----- end
 
+$VmConfig = New-PAzureRmVmConfig -VmNameInput $VmName -PVmSizeAuto $PVmSize
 
+Set-AzureRmVMOperatingSystem -VM $VmConfig -ComputerName -Windows -Credential $Cred
 
+#Set-AzureRmVMSourceImage
+get-command *publisher*
+get-help Get-AzureRmVMImagePublisher
+get-help Get-AzureRmVMImageSku
 
+get-cmEnumArray -Arr (Get-AzureRmVMImagePublisher -Location (Get-PLocation $Location)) -ListName PublisherName
 
