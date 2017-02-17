@@ -51,6 +51,7 @@ get-help Get-AzureRmVMImagePublisher
 get-help Get-AzureRmVMImageSku
 
 get-cmEnumArray -Arr (Get-AzureRmVMImagePublisher -Location (Get-PLocation $Location)) -ListName PublisherName
-Get-PAzureRmVmImagePublisher -LocationInput $Location -PublisherNameInput $PublisherName
+Get-PAzureRmVmImagePublisher -LocationAuto $Location -PublisherNamePassThru $PublisherName
 
 Get-AzureRmVMImageSku -Location (Get-PLocation $Location) -PublisherName
+

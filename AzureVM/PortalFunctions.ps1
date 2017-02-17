@@ -127,16 +127,19 @@ function global:Get-PLocation # Gets the location as the portal would
     [OutputType([string])]
     param
     (
-        $LocationInput
+        [ref]$LocationInput
     )
-    if ($LocationInput -eq $null)
+    $Loc = $LocationInput.Value
+    if ($Loc -eq $null)
     {
-        get-cmEnumArray -Arr (get-AzureRmLocation | Select-Object -Property Location) -ListName Location
+        $Loc = get-cmEnumArray -Arr (get-AzureRmLocation | Select-Object -Property Location) -ListName Location
     }
-    else
+    elseif ($Loc.Length -eq 0)
     {
-        $LocationInput
+        $Loc = get-cmEnumArray -Arr (get-AzureRmLocation | Select-Object -Property Location) -ListName Location
     }
+    $Loc
+    $LocationInput.Value = $Loc
 }
 
 
@@ -222,16 +225,16 @@ function global:Get-PAzureRmVmImagePublisher
 {
     param
     (
-        $LocationInput,
-        $PublisherNameInput
+        $PublisherNamePassThru,
+        $LocationAuto
     )
-    if ($PublisherNameInput -ne $null)
+    if ($PublisherNamePassThru -ne $null)
     {
-        $PublisherNameInput
+        $PublisherNamePassThru
     }
     else
     {
-        if ($LocationInput -eq $null) {$LocationInput = (Get-PLocation $LocationInput)}
-        get-cmEnumArray -Arr (Get-AzureRmVMImagePublisher -Location $LocationInput) -ListName PublisherName
+        if ($LocationInput -eq $null) {$LocationInput = (Get-PLocation $LocationAuto)}
+        get-cmEnumArray -Arr (Get-AzureRmVMImagePublisher -Location $LocationAuto) -ListName PublisherName
     }
 }
