@@ -1,4 +1,12 @@
 ﻿# Author: Clifford MacKay
+
+# Quick sample for finding state of RM VMs
+function global:get-VmStatus
+{
+    Get-AzureRmResourceGroup | Get-AzureRmVM -Status
+}
+
+
 # ----- Logon -----
 
 function global:Logon
@@ -285,8 +293,8 @@ function global:New-cmLoadBalancer
 # SIG # Begin signature block
 # MIIEMwYJKoZIhvcNAQcCoIIEJDCCBCACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUgyBlYZ+rFQtxoqyXnQgoTeF8
-# tM+gggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU83mNX3swHYTBUCxbVgaMItnN
+# H2ygggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
 # MCwxKjAoBgNVBAMTIVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdDAe
 # Fw0xNzAyMDkxNzU3NDBaFw0zOTEyMzEyMzU5NTlaMBoxGDAWBgNVBAMTD1Bvd2Vy
 # U2hlbGwgVXNlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAxJMXSX2yDza4
@@ -302,8 +310,8 @@ function global:New-cmLoadBalancer
 # cnRpZmljYXRlIFJvb3QCEF6p4BzLRSWQS77SgeZDGJswCQYFKw4DAhoFAKB4MBgG
 # CisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcC
 # AQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYE
-# FHuTKIPq92htr4aakvTKBMfD7mgjMA0GCSqGSIb3DQEBAQUABIGALgy7/wKEbnyu
-# s2TpJMQBfBPTWNzeflbvPkiwi5IK+mUhUUwCyTyU2Tdif1sVI+FGBDI0hILRpQAT
-# oKxGgJCoX7ZXJYcCHiSWrZHKelPXIHjUtqI5hdcIKGQw0UnwzMB6/0KgUOdaq6Yi
-# Wk+eDJtWiR2kvg26GU9VV6XNAbmTVEI=
+# FP/Xd/Jy3/1SgVawkb/BjQBSXTfJMA0GCSqGSIb3DQEBAQUABIGAAYH1XLSk498O
+# +J6QhJ4IDggJ6iKl+4dEKC4nKWhHEMUTQEzVcoW+zRDllCJ2H94W/KMV/CtUHh3e
+# uNQDc4Vt0xz9FYJAPO4uvuIAvBubKShU6WOLBqV5mvG1sAmthkB7CxQh5BSe4sbe
+# b90kVx0drJ8h7omIcfEtdnIQRX+ir+o=
 # SIG # End signature block
