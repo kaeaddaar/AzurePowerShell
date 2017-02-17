@@ -216,3 +216,22 @@ function global:Set-PAzureRmVMOperatingSystem
     Set-AzureRmVMOperatingSystem -VM $VmInput -ComputerName $ComputerNameInput -Credential $CredentialInput -Windows
     
 }
+
+#get-cmEnumArray -Arr (Get-AzureRmVMImagePublisher -Location (Get-PLocation $Location)) -ListName PublisherName
+function global:Get-PAzureRmVmImagePublisher
+{
+    param
+    (
+        $LocationInput,
+        $PublisherNameInput
+    )
+    if ($PublisherNameInput -ne $null)
+    {
+        $PublisherNameInput
+    }
+    else
+    {
+        if ($LocationInput -eq $null) {$LocationInput = (Get-PLocation $LocationInput)}
+        get-cmEnumArray -Arr (Get-AzureRmVMImagePublisher -Location $LocationInput) -ListName PublisherName
+    }
+}
