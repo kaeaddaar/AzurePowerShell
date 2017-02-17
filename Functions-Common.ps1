@@ -100,7 +100,7 @@ function global:New-cmStorageAccount ([Parameter(Mandatory=$true)] [String]$RGNa
     NB $StorageName
     $goodName = Get-AzureRmStorageAccountNameAvailability $StorageName
     #write-host 'goodName.NameAvailable = "' $goodName.NameAvailable
-    sleep 5
+    Start-Sleep 5
     if ($goodName.NameAvailable)
     {
         $RGStorageAccount = New-AzureRmStorageAccount -ResourceGroupName $RGName -Name $StorageName -Kind Storage -Location $RGLoc -SkuName "Standard_LRS"

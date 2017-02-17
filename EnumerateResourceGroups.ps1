@@ -1,6 +1,6 @@
 ﻿$sleep = 2
 write-host "01-Logon"
-sleep $sleep
+Start-Sleep $sleep
 
 # enter your logon info
 Login-AzureRmAccount -SubscriptionName "Visual Studio Enterprise – MPN"
@@ -23,7 +23,7 @@ $RGName = $colRG[$RGNum].ResourceGroupName
 
 # Loop through resources in a ResourceGroup
 write-host "02-Show contents of $RGName"
-sleep $sleep
+Start-Sleep $sleep
 
 $EnumRG = -1
 # $listRG = Get-AzureRmResource | Where-Object {$_.ResourceGroupName -eq "cmTestRG01" } | Select-Object -Property Name, ResourceType

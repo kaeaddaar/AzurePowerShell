@@ -13,7 +13,7 @@
  [String] $SubscriptionId,
 
  [Parameter(Mandatory=$true)]
- [String] $CertPlainPassword,
+ [SecureString] $CertPlainPassword,
 
  [Parameter(Mandatory=$false)]
  [int] $NoOfMonthsUntilExpired = 12
@@ -32,7 +32,7 @@
  #set the sleep time after comments
  $SleepTime = 3
  Write-Host "01-AfterLogon"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
  $CurrentDate = Get-Date
  $EndDate = $CurrentDate.AddMonths($NoOfMonthsUntilExpired)
@@ -40,7 +40,7 @@
  $CertPath = Join-Path $env:TEMP ($ApplicationDisplayName + ".pfx")
 
  Write-Host "02-After Variables set"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
  $Cert = New-SelfSignedCertificate -DnsName $ApplicationDisplayName -CertStoreLocation cert:\LocalMachine\My -KeyExportPolicy Exportable -Provider "Microsoft Enhanced RSA and AES Cryptographic Provider"
 
@@ -48,14 +48,14 @@
  Export-PfxCertificate -Cert ("Cert:\localmachine\my\" + $Cert.Thumbprint) -FilePath $CertPath -Password $CertPassword -Force | Write-Verbose
 
  Write-Host "03-After Cert pwd before PFX Cert"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
  $PFXCert = New-Object -TypeName System.Security.Cryptography.X509Certificates.X509Certificate -ArgumentList @($CertPath, $CertPlainPassword)
  $KeyValue = [System.Convert]::ToBase64String($PFXCert.GetRawCertData())
 
  Write-Host "04-Before KeyCredential"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
  $KeyCredential = New-Object  Microsoft.Azure.Commands.Resources.Models.ActiveDirectory.PSADKeyCredential
  $KeyCredential.StartDate = $CurrentDate
@@ -66,21 +66,21 @@
  $KeyCredential.CertValue = $KeyValue
 
  Write-Host "04a-Before New-AzureRmADApplication"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
  # Use Key credentials
  $Application = New-AzureRmADApplication -DisplayName $ApplicationDisplayName -HomePage ("http://" + $ApplicationDisplayName) -IdentifierUris ("http://" + $KeyId) -KeyCredentials $keyCredential
 
  Write-Host "05-after New-AzureRmADApplication, before New-AzureRMADServicePrincipal"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
  New-AzureRMADServicePrincipal -ApplicationId $Application.ApplicationId | Write-Verbose
- Get-AzureRmADServicePrincipal | Where {$_.ApplicationId -eq $Application.ApplicationId} | Write-Verbose
+ Get-AzureRmADServicePrincipal | Where-Object {$_.ApplicationId -eq $Application.ApplicationId} | Write-Verbose
 
  Write-Host "06-Before While Loop"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
  $NewRole = $null
@@ -88,23 +88,23 @@
  While ($NewRole -eq $null -and $Retries -le 6)
  {
     # Sleep here for a few seconds to allow the service principal application to become active (should only take a couple of seconds normally)
-    Sleep 5
+    Start-Sleep 5
     New-AzureRMRoleAssignment -RoleDefinitionName Contributor -ServicePrincipalName $Application.ApplicationId | Write-Verbose -ErrorAction SilentlyContinue
-    Sleep 10
+    Start-Sleep 10
     $NewRole = Get-AzureRMRoleAssignment -ServicePrincipalName $Application.ApplicationId -ErrorAction SilentlyContinue
     $Retries++;
  }
 
  Write-Host "07-After while loop"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
  # Get the tenant id for this subscription
  $SubscriptionInfo = Get-AzureRmSubscription -SubscriptionId $SubscriptionId
- $TenantID = $SubscriptionInfo | Select TenantId -First 1
+ $TenantID = $SubscriptionInfo | Select-Object TenantId -First 1
 
  Write-Host "08-before create of automation resources"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
  # Create the automation resources
@@ -118,7 +118,7 @@
 On your computer, start Windows PowerShell from the Start screen with elevated user rights.
 
  Write-Host "09-Done"
- Sleep $SleepTime
+ Start-Sleep $SleepTime
 
 
 # SIG # Begin signature block
