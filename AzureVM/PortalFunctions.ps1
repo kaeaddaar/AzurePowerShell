@@ -81,6 +81,47 @@ function global:get-cmEnumResourceGroup # Returns the ResourceGroup selected
 }
 
 
+<#
+.Synopsis
+   Enumerate an Array
+.DESCRIPTION
+   Enumerate an Array
+.EXAMPLE
+   Example of how to use this cmdlet
+.EXAMPLE
+   Another example of how to use this cmdlet
+#>
+function Enum-Array
+{
+    [CmdletBinding()]
+    [Alias()]
+    [OutputType([int])]
+    Param
+    (
+        # Param1 help description
+        [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   Position=0)]
+        [System.Array]
+        $Array,
+
+        # Param2 help description
+        [String]
+        $PropertyName
+    )
+
+    Begin
+    {
+    }
+    Process
+    {
+    }
+    End
+    {
+    }
+}
+
+
 function global:get-cmEnumArray
 {
     [OutputType([string])]
@@ -121,7 +162,7 @@ function global:get-cmEnumArray
 }
 
 
-
+<#
 function global:Get-PLocation # Gets the location as the portal would
 {
     [OutputType([string])]
@@ -129,8 +170,8 @@ function global:Get-PLocation # Gets the location as the portal would
     (
         [ref]$LocationInput
     )
-    $Loc = $LocationInput.Value
-    if ($Loc -eq $null)
+    [string]$Loc = $LocationInput.Value
+    if ($Loc -eq $null) # Null won't happen due to ref type, but leaving it in, incase we change things
     {
         $Loc = get-cmEnumArray -Arr (get-AzureRmLocation | Select-Object -Property Location) -ListName Location
     }
@@ -141,6 +182,27 @@ function global:Get-PLocation # Gets the location as the portal would
     $Loc
     $LocationInput.Value = $Loc
 }
+#>
+
+
+function global:Get-PLocation # Gets the location as the portal would
+{
+    [OutputType([string])]
+    param
+    (
+        $LocationInput
+    )
+
+    if ($LocationInput -eq $null) # Null won't happen due to ref type, but leaving it in, incase we change things
+    {
+        $LocationInput = get-cmEnumArray -Arr (get-AzureRmLocation | Select-Object -Property Location) -ListName Location
+    }
+    elseif ($LocationInput.Length -eq 0)
+    {
+        $LocationInput = get-cmEnumArray -Arr (get-AzureRmLocation | Select-Object -Property Location) -ListName Location
+    }
+    $LocationInput
+}
 
 
 function global:Get-PVMSize # Gets the VMSize as the portal would
@@ -148,17 +210,18 @@ function global:Get-PVMSize # Gets the VMSize as the portal would
     [OutputType([string])]
     param
     (
-        $VMSizeInput, 
+        $VMSizePassThru, 
         $LocationAuto
     )
-    if ($VMSizeInput -eq $null)
+    if ($VMSizePassThru -eq $null)
     {
-        get-cmEnumArray -Arr ((get-azurermvmsize -Location (Get-PLocation $LocationAuto)) | Select-Object -Property Name) -ListName Name
+        $VMSizePassThru = get-cmEnumArray -Arr ((get-azurermvmsize -Location (Get-PLocation $LocationAuto)) | Select-Object -Property Name) -ListName Name
     }
-    else
+    elseif ($VMSizePassThru.Length -eq 0)
     {
-        $VMSizeInput
+        $VMSizePassThru = get-cmEnumArray -Arr ((get-azurermvmsize -Location (Get-PLocation $LocationAuto)) | Select-Object -Property Name) -ListName Name
     }
+    $VMSizePassThru
 }
 
 
@@ -167,16 +230,31 @@ function global:New-PAzureRmVm
     param
     (
         $VmNameInput,
-        $RgInput
+        $RgPassThru
     )
 
-    if ($RgInput -eq $null)
+    if ($RgPassThru -eq $null)
     {
-        get-cmEnumResourceGroup -RgInput $RgInput
-        
+        get-cmEnumResourceGroup -RgInput $RgPassThru
+    }
+    elseif($RgPassThru.GetType() -ne "Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup")
+    {
+        get-cmEnumResourceGroup -RgInput $RgPassThru
     }
     
+    if ($VmNameInput -eq $null)
+    {
+        $VmNameInput = Read-Host "Enter the VM Name"
+    }
+    elseif ($VmNameInput.length -eq 0)
+    {
+        $VmNameInput = Read-Host "Enter the VM Name"
+    }
+
     # Start by getting the config
+    $VmCfg = New-PAzureRmVm -VmNameInput $VmNameInput -RgPassThru $RgPassThru
+
+    $VmCfg = Set-PAzureRmVMOperatingSystem -VmInput $VmCfg -ComputerNameInput $VmNameInput
     
 
 }
@@ -198,7 +276,7 @@ function global:New-PAzureRmVmConfig
     if ($VmNameInput.Length -lt 2) {Write-Output "Length must be at least 2 characters. Try again."; $VmNameInput = Read-Host}
     if ($VmNameInput.Length -lt 2) {Write-Output "Length must be at least 2 characters. Breaking."; Break}
 
-    $VmConfig = new-azurermvmconfig -VMName $VmNameInput (Get-PVMSize $PVmSizeAuto) 
+    $VmConfig = new-azurermvmconfig -VMName $VmNameInput (Get-PVMSize ([ref]$PVmSizeAuto)) 
 
 }
 
