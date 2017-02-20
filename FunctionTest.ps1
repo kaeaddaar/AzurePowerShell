@@ -38,45 +38,51 @@ Write-Host "Load Balancer begin"
 # ----- Create a Load Balancer ----- begin
 # https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-get-started-internet-arm-ps
 
-$FrontEndIpName = "cmPsFrontEndIp"
-$FrontEndPrivateIp = "10.0.0.5"
+$FrontEndIpPoolName = "cmPsFrontEndIp" # private, naming convention needed
+$FrontEndPrivateIp = "10.0.0.5" # private, numbering system needed
 Write-Host '$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig ...'
-$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig -Name $FrontEndIpName -PrivateIpAddress $FrontEndPrivateIp -SubnetId $RGVnet.subnets[0].Id
+# private
+$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig -Name $FrontEndIpPoolName -PrivateIpAddress $FrontEndPrivateIp -SubnetId $RGVnet.subnets[0].Id
 
-$BackEndIpName = "cmPsBackEndIp"
+$BackEndIpPoolName = "cmPsBackEndIp" # private, naming convention needed
 Write-host '$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig ...'
-$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig -Name $BackEndIpName
+# private
+$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig -Name $BackEndIpPoolName
 
-$InboundNatRuleName1 = "cmPsInboundNatRdp1"
-$Inbound1FrontPort = 3441 
-$InboundNatRuleName2 = "cmPsInboundNatRdp2"
-$Inbound2FrontPort = 3442
-$BackEndPort = 3389
-$InboundProtocol = "Tcp"
+$InboundNatRuleName1 = "cmPsInboundNatRdp1" # private, naming convention needed
+$Inbound1FrontPort = 3441 # private
+$InboundNatRuleName2 = "cmPsInboundNatRdp2" # private, naming convention needed
+$Inbound2FrontPort = 3442 # private
+$BackEndPort = 3389 # private
+$InboundProtocol = "Tcp" # private
 Write-Host '$RGInboundNatRule1 = New-AzureRmLoadBalancerInboundNatRuleConfig ...'
+# private
 $RGInboundNatRule1 = New-AzureRmLoadBalancerInboundNatRuleConfig -Name $InboundNatRuleName1 -FrontendIpConfiguration $RGFrontEndIp -Protocol $InboundProtocol -FrontendPort $Inbound1FrontPort -BackendPort $BackEndPort
 WRite-host '$RGInboundNatRule2 = New-AzureRmLoadBalancerInboundNatRuleConfig ...'
+# private
 $RGInboundNatRule2 = New-AzureRmLoadBalancerInboundNatRuleConfig -Name $InboundNatRuleName2 -FrontendIpConfiguration $RGFrontEndIp -Protocol $InboundProtocol -FrontendPort $Inbound2FrontPort -BackendPort $BackEndPort
 
-$HealthProbeName = "cmPsHealthProbe"
-$HealthProbeRequestPath = "./"
-$HealthProbeProtocol = "http"
-$HealthProbePort = 80
-$HealthProbeIntervalInSeconds = 15
-$HealthProbeProbeCount = 2
-$LoadBalanceRuleName = "cmPsLoadBalanceRule"
-$LoadBalanceProtocol = "Tcp"
-$LoadBalanceFrontEndPort = 80
-$LoadBalanceBackEndPort = 80
+$HealthProbeName = "cmPsHealthProbe" # private
+$HealthProbeRequestPath = "./" # private
+$HealthProbeProtocol = "http" # private
+$HealthProbePort = 80 # private
+$HealthProbeIntervalInSeconds = 15 # private
+$HealthProbeProbeCount = 2 # private
+$LoadBalanceRuleName = "cmPsLoadBalanceRule" # private, naming convention might be needed
+$LoadBalanceProtocol = "Tcp" # private
+$LoadBalanceFrontEndPort = 80 # private
+$LoadBalanceBackEndPort = 80 # private
 write-host '$RGHealthProbe = New-AzureRmLoadBalancerProbeConfig'
+# private
 $RGHealthProbe = New-AzureRmLoadBalancerProbeConfig -Name $HealthProbeName -RequestPath $HealthProbeRequestPath -Protocol $HealthProbeProtocol -Port $HealthProbePort -IntervalInSeconds $HealthProbeIntervalInSeconds -ProbeCount $HealthProbeProbeCount
 Write-Host '$RGLoadBalanceRule = New-AzureRmLoadBalancerRuleConfig'
+# private
 $RGLoadBalanceRule = New-AzureRmLoadBalancerRuleConfig -Name $LoadBalanceRuleName -FrontendIpConfiguration $RGFrontEndIp -BackendAddressPool $RGBackEndAddressPool -Probe $RGHealthProbe -Protocol $LoadBalanceProtocol -FrontendPort $LoadBalanceFrontEndPort -BackendPort $LoadBalanceBackEndPort
 
-$LoadBlancerName = "cmPsLoadBalancer"
+$LoadBlancerName = "cmPsLoadBalancer" # private
 write-host '$RGLoadBalancer = New-AzureRmLoadBalancer ...'
 $RGLoadBalancer = New-AzureRmLoadBalancer -ResourceGroupName $Rg.ResourceGroupName -Name $LoadBlancerName -Location $locName -FrontendIpConfiguration $RGFrontEndIp -InboundNatRule $RGInboundNatRule1 -BackendAddressPool $RGBackEndAddressPool -Probe $RGHealthProbe
-
+  
 #$VnetBackEndSubnetName = "cmpsbackendsubnet"
 $VnetBackEndSubnetName = $SubnetName
 Write-Host '$RGBackEndSubnet = Get-AzureRmVirtualNetworkSubnetConfig ...'
