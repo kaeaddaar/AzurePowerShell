@@ -156,7 +156,7 @@ function global:get-cmEnumArray
         Write-Output $ArrNum + " is not a valid choice, exiting."
         break
     }
-    [String]$Return = $Arr[$ArrNum] | Select -ExpandProperty $ListName
+    [String]$Return = $Arr[$ArrNum] | Select-Object -ExpandProperty $ListName
     $Return
 
 }
@@ -288,7 +288,7 @@ function global:Set-PAzureRmVMOperatingSystem
     (
         $VmInput,
         $ComputerNameInput,
-        $CredentialInput
+        [SecureString] $CredentialInput
     )
 
     if ($VmInput -eq $null) {New-PAzureRmVmConfig -VmNameInput $ComputerNameInput -PVmSizeAuto $VmSize}
