@@ -43,7 +43,7 @@ $HSettings.var1 = "Hello WOrld"
 get-help Add-Member -full
 $HSettings | gm
 
-# ----- Time to write some sample code -----
+# ----- Time to write some sample code for a snippet -----
 $HSettings = @{"VmName"="TestVm1"}
 $HSettings | Add-Member-MakeKeyScript
 
@@ -57,4 +57,7 @@ if ($HSettings.Location.Length -eq 0)
     $HSettings.Location = $lstLocation.Item((READ-host "Select number of a location"))
 }
 $HSettings.Location
+
+# ----- I want to pipe to Make-Key, so I'll make a Make-Key cmdlet to call Make-Key on the Hash Variable
+("Var1", "Var2") | Make-Key -Obj $HSettings
 
