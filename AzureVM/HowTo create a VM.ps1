@@ -55,3 +55,14 @@ Get-PAzureRmVmImagePublisher -LocationAuto $Location -PublisherNamePassThru $Pub
 
 Get-AzureRmVMImageSku -Location (Get-PLocation $Location) -PublisherName
 
+#New way
+import-module portalfunctionality
+$HSetting = @{"VmName"="TestVm1"}
+$HSetting | Add-Member-MakeKeyScript
+
+Prep-AzureRmVmComfig $HSetting
+$VM = New-AzureRmVmConfig -VmName $HSetting.VmName, VmSize
+$Cred = Get-Credential
+Set-AzureRmVMOperatingSystem -VM $VM -ComputerName $HSetting.VmName -Credential $Cred
+Prep-AzureRmVmSourceImage $HSetting
+Set-AzureRmVMSourceImage -VM $VM -PublisherName $HSetting.PublisherName -Skus $HSetting.Skus

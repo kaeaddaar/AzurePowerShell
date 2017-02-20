@@ -174,6 +174,7 @@ function global:Format-Columnnize
 .EXAMPLE
    $HashVar = @{"Key1"="Val1"}
    Add-Member-MakeKeyScript -Hash $HashVar
+   $HashVar.MakeKey("Key2")
    $HashVar.'Key2' = "Val2"
    $HashVar
 Results: 
@@ -186,6 +187,8 @@ Key2                           Val2
    $HashVar = @{"Key1"="Val1"}
    $HashVar2 = @{"Key1"="Val1"}
    ($HashVar2, $HashVar) | Add-Member-MakeKeyScript
+   $HashVar2.MakeKey("Key2")
+   $HashVar.MakeKey("Key2")
    $HashVar2.'Key2' = "Val2"
    $HashVar.'Key2' = "Val2"
    $HashVar2
