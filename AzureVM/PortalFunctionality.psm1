@@ -174,7 +174,6 @@ function global:Format-Columnnize
 .EXAMPLE
    $HashVar = @{"Key1"="Val1"}
    Add-Member-MakeKeyScript -Hash $HashVar
-   $HashVar.MakeKey("Key2")
    $HashVar.'Key2' = "Val2"
    $HashVar
 Results: 
@@ -187,8 +186,6 @@ Key2                           Val2
    $HashVar = @{"Key1"="Val1"}
    $HashVar2 = @{"Key1"="Val1"}
    ($HashVar2, $HashVar) | Add-Member-MakeKeyScript
-   $HashVar2.MakeKey("Key2")
-   $HashVar.MakeKey("Key2")
    $HashVar2.'Key2' = "Val2"
    $HashVar.'Key2' = "Val2"
    $HashVar2
@@ -230,3 +227,99 @@ Function global:Add-Member-MakeKeyScript
 }
 
 
+<#
+.Synopsis
+   Short description
+.DESCRIPTION
+   Long description
+.EXAMPLE
+   Example of how to use this cmdlet
+.EXAMPLE
+   Another example of how to use this cmdlet
+.INPUTS
+   Inputs to this cmdlet (if any)
+.OUTPUTS
+   Output from this cmdlet (if any)
+.NOTES
+   General notes
+.COMPONENT
+   The component this cmdlet belongs to
+.ROLE
+   The role this cmdlet belongs to
+.FUNCTIONALITY
+   The functionality that best describes this cmdlet
+#>
+function global:Make-Key
+{
+    [CmdletBinding(DefaultParameterSetName='Parameter Set 1', 
+                  SupportsShouldProcess=$true, 
+                  PositionalBinding=$false,
+                  HelpUri = 'http://www.microsoft.com/',
+                  ConfirmImpact='Medium')]
+    [Alias()]
+    [OutputType([String])]
+    Param
+    (
+        # The name of other the hash name to be passed to the Make-Key
+        [Parameter(Mandatory=$true, 
+                   ValueFromPipeline=$true,
+                   ValueFromPipelineByPropertyName=$true, 
+                   Position=0,
+                   ParameterSetName='Parameter Set 1')]
+        [ValidatePattern("[a-z]*")]
+        $Name,
+        
+        #
+        [ValidateNotNull()]
+        [PSObject]$Obj
+    )
+
+    Begin
+    {
+    }
+    Process
+    {
+        $Obj.'Make-Key'($Name,"")
+    }
+    End
+    {
+    }
+}
+
+
+# This function handles the displaying of an enumerated list, selecting an option, and saving it to the setting Hash
+Function Get-PropFromColObj
+{
+    Param
+    (
+        $ColObj,
+        $HashSetting,
+        $ExpandProperty,
+        $NumColumns = 2
+    )
+    if ($Hash.Location.Length -eq 0)
+    {
+        ($lstTemp = $ColObj | Select-Object -ExpandProperty $ExpandProperty) | Enum-String | Format-Columnnize $NumColumns
+        Read-Host "Press any key to see list of locations"
+        $HashSetting.$ExpandProperty = $lstTemp.Item((READ-host "Select number of a $ExpandProperty"))
+    }
+}
+
+<#
+# Sample use of get-PropFromColObj function
+Get-PropFromColObj -ColObj get-azureRMLocation -Hash $HSetting -ExpandProperty "Location" -NumColumns 3
+#>
+
+function Prep-AzureRmVmConfig
+{
+    Param
+    (
+        $HashSetting
+    )
+
+    # Need VmName, VmSize, Location
+    "VmName", "Location", "VmSize" | Make-Key -Obj $HashSetting
+    Get-PropFromColObj -ColObj (Get-Location) -Hash $HashSetting -ExpandProperty "Location" -NumColumns 4
+    Get-PropFromColObj -ColObj (Get-AzureRmVMSize -Location $HashSetting.Location) -Hash $HashSetting -ExpandProperty "Name" -NumColumns 4
+    $HashSetting
+}

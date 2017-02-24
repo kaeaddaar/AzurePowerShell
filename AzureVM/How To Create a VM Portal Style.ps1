@@ -1,7 +1,4 @@
-﻿$HSetting = @{"VmName"="TestVm1"}
-$HSetting | Add-Member-MakeKeyScript
-
-
+﻿
 # This function handles the displaying of an enumerated list, selecting an option, and saving it to the setting Hash
 Function Get-PropFromColObj
 {
@@ -38,4 +35,25 @@ function Prep-AzureRmVmConfig
     $HashSetting
 }
 
-Prep-AzureRmVmConfig $HSetting
+#New way
+import-module portalfunctionality
+$HSetting = @{"VmName"="TestVm1"}
+$HSetting | Add-Member-MakeKeyScript
+
+Prep-AzureRmVmComfig $HSetting
+$VM = New-AzureRmVmConfig -VmName $HSetting.VmName, VmSize
+$Cred = Get-Credential
+Set-AzureRmVMOperatingSystem -VM $VM -ComputerName $HSetting.VmName -Credential $Cred
+
+Prep-AzureRmVmSourceImage $HSetting
+Set-AzureRmVMSourceImage -VM $VM -PublisherName $HSetting.PublisherName -Skus $HSetting.Skus
+
+
+Prep-AzureRmNetworkInterface $HSetting
+    # set up SubNet, and PublicIp
+        #Set up VNet
+
+New-AzureRmNetworkInterface -Name $HSetting.NicName -ResourceGroupName $HSetting.ResourceGroupName `
+    -Location $HSetting.Location -SubnetId $HSetting.SubNetId -PublicIpAddressId $HSetting.NicPublicIp
+
+
