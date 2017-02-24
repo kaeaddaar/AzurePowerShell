@@ -88,3 +88,6 @@ new-azurermvm -ResourceGroupName $H.RGName -Location $RGLoc -VM $RGVm
 #Get-AzureRMVMImageSku -Location "West US 2" -Publisher "MicrosoftWindowsServer" -Offer "WindowsServer" | Select Skus
 
 Write-Host "Done"
+
+New-AzureRmTrafficManagerProfile -Name DevApiTest2TrafficManager -ResourceGroupName "DevApi_Test" -ProfileStatus Enabled -RelativeDnsName "DevApiTM2" -Ttl 300 -TrafficRoutingMethod Performance -MonitorProtocol HTTP -MonitorPath "/"
+
