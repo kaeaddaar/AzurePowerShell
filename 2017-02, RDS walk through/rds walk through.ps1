@@ -5,7 +5,6 @@ if((Read-Host) -eq "Y"){ Login-azurermaccount -SubscriptionName "VSE MPN" }
     $H = New-Object hashtable
     $H."ResourceGroup.Name" = "cmRds2017"
     $H."Location"
-    $H."AffinityGroup.Name" = $H.'ResourceGroup.Name' + "AG"
 
 # Create a resource group
     $H."ResourceGroup.Name" = "cmRds2017"
@@ -23,7 +22,11 @@ if((Read-Host) -eq "Y"){ Login-azurermaccount -SubscriptionName "VSE MPN" }
     # did the resource group Create successfully
     Get-AzureRmResourceGroup $H.'ResourceGroup.Name' # This will create a terminating error if the resource group doesn't exist
 
-# Create an affinity group is the classic way, but the resource group replaces this
+# (Resource Group) Create an affinity group is the classic way, but the resource group replaces this. Won't be creating an affinity group
+
+# Create a new Windows Azure Storage Account
+
+
 
 
 
