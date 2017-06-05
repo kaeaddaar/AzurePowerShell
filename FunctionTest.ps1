@@ -1,7 +1,7 @@
 ﻿#Functions-Common.ps1 needs to be run to create the global functions
 # Logon
 # getEnumResourceGroup
-Clear-Host
+cls
 Write-Host ----- Welcome to the Function Test Powershell Application -----
 Write-Host
 logon
@@ -13,7 +13,6 @@ logon
 
 #Write-Host "Please enter a step to skip to, or hit enter to continue"
 #$StepNum = Read-Host
-$ErrorActionPreference = "stop"
 
     #The following test shows how to get the ResourceGroupChosen
     [Microsoft.Azure.Commands.ResourceManager.Cmdlets.SdkModels.PSResourceGroup]$RG = Get-cmEnumResourceGroup
@@ -38,35 +37,66 @@ Write-Host "Load Balancer begin"
 
 # ----- Create a Load Balancer ----- begin
 # https://docs.microsoft.com/en-us/azure/load-balancer/load-balancer-get-started-internet-arm-ps
-$InputX = @{
-    "FrontEndIpName" = "cmPsFrontEndIp"
-    "FrontEndPrivateIp" = "10.0.0.5"
-    "BackEndIpName" = "cmPsBackEndIp"
-    "InboundNatRuleName1" = "cmPsInboundNatRdp1"
-    "Inbound1FrontPort" = 3441
-    "InboundNatRuleName2" = "cmPsInboundNatRdp2"
-    "Inbound2FrontPort" = 3442
-    "BackEndPort" = 3389
-    "InboundProtocol" = "Tcp"
-    "HealthProbeName" = "cmPsHealthProbe"
-    "HealthProbeRequestPath" = "./"
-    "HealthProbeProtocol" = "http"
-    "HealthProbePort" = 80
-    "HealthProbeIntervalInSeconds" = 15
-    "HealthProbeProbeCount" = 2
-    "LoadBalancerName" = "cmPsLoadBalancer"
-    "LoadBalanceRuleName" = "cmPsLoadBalanceRule"
-    "LoadBalanceProtocol" = "Tcp"
-    "LoadBalanceFrontEndPort" = 80
-    "LoadBalanceBackEndPort" = 80
-    "BackEndNic1Name" = "cmpsbackendnic1"
-    "BackEndPrivateIp1" = "10.0.0.6"
-    "BackEndNic2Name" = "cmpsbackendnic2"
-    "BackEndPrivateIp2" = "10.0.0.7"
-}
 
-$RGLoadBalancer = New-cmLoadBalancer -RGName $RG.ResourceGroupName -RGVnet $RGVnet -InputX $InputX
+$FrontEndIpPoolName = "cmPsFrontEndIp" # private, naming convention needed
+$FrontEndPrivateIp = "10.0.0.5" # private, numbering system needed
+Write-Host '$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig ...'
+# private
+$RGFrontEndIp = New-AzureRmLoadBalancerFrontendIpConfig -Name $FrontEndIpPoolName -PrivateIpAddress $FrontEndPrivateIp -SubnetId $RGVnet.subnets[0].Id
 
+$BackEndIpPoolName = "cmPsBackEndIp" # private, naming convention needed
+Write-host '$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig ...'
+# private
+$RGBackEndAddressPool = New-AzureRmLoadBalancerBackendAddressPoolConfig -Name $BackEndIpPoolName
+
+$InboundNatRuleName1 = "cmPsInboundNatRdp1" # private, naming convention needed
+$Inbound1FrontPort = 3441 # private
+$InboundNatRuleName2 = "cmPsInboundNatRdp2" # private, naming convention needed
+$Inbound2FrontPort = 3442 # private
+$BackEndPort = 3389 # private
+$InboundProtocol = "Tcp" # private
+Write-Host '$RGInboundNatRule1 = New-AzureRmLoadBalancerInboundNatRuleConfig ...'
+# private
+$RGInboundNatRule1 = New-AzureRmLoadBalancerInboundNatRuleConfig -Name $InboundNatRuleName1 -FrontendIpConfiguration $RGFrontEndIp -Protocol $InboundProtocol -FrontendPort $Inbound1FrontPort -BackendPort $BackEndPort
+WRite-host '$RGInboundNatRule2 = New-AzureRmLoadBalancerInboundNatRuleConfig ...'
+# private
+$RGInboundNatRule2 = New-AzureRmLoadBalancerInboundNatRuleConfig -Name $InboundNatRuleName2 -FrontendIpConfiguration $RGFrontEndIp -Protocol $InboundProtocol -FrontendPort $Inbound2FrontPort -BackendPort $BackEndPort
+
+$HealthProbeName = "cmPsHealthProbe" # private
+$HealthProbeRequestPath = "./" # private
+$HealthProbeProtocol = "http" # private
+$HealthProbePort = 80 # private
+$HealthProbeIntervalInSeconds = 15 # private
+$HealthProbeProbeCount = 2 # private
+$LoadBalanceRuleName = "cmPsLoadBalanceRule" # private, naming convention might be needed
+$LoadBalanceProtocol = "Tcp" # private
+$LoadBalanceFrontEndPort = 80 # private
+$LoadBalanceBackEndPort = 80 # private
+write-host '$RGHealthProbe = New-AzureRmLoadBalancerProbeConfig'
+# private
+$RGHealthProbe = New-AzureRmLoadBalancerProbeConfig -Name $HealthProbeName -RequestPath $HealthProbeRequestPath -Protocol $HealthProbeProtocol -Port $HealthProbePort -IntervalInSeconds $HealthProbeIntervalInSeconds -ProbeCount $HealthProbeProbeCount
+Write-Host '$RGLoadBalanceRule = New-AzureRmLoadBalancerRuleConfig'
+# private
+$RGLoadBalanceRule = New-AzureRmLoadBalancerRuleConfig -Name $LoadBalanceRuleName -FrontendIpConfiguration $RGFrontEndIp -BackendAddressPool $RGBackEndAddressPool -Probe $RGHealthProbe -Protocol $LoadBalanceProtocol -FrontendPort $LoadBalanceFrontEndPort -BackendPort $LoadBalanceBackEndPort
+
+$LoadBlancerName = "cmPsLoadBalancer" # private
+write-host '$RGLoadBalancer = New-AzureRmLoadBalancer ...'
+$RGLoadBalancer = New-AzureRmLoadBalancer -ResourceGroupName $Rg.ResourceGroupName -Name $LoadBlancerName -Location $locName -FrontendIpConfiguration $RGFrontEndIp -InboundNatRule $RGInboundNatRule1 -BackendAddressPool $RGBackEndAddressPool -Probe $RGHealthProbe
+  
+#$VnetBackEndSubnetName = "cmpsbackendsubnet"
+$VnetBackEndSubnetName = $SubnetName
+Write-Host '$RGBackEndSubnet = Get-AzureRmVirtualNetworkSubnetConfig ...'
+$RGBackEndSubnet = Get-AzureRmVirtualNetworkSubnetConfig -Name $VnetBackEndSubnetName -VirtualNetwork $RGVnet
+$BackEndNic1Name = "cmpsbackendnic1"
+$BackEndPrivateIp1 = "10.0.0.6"
+Write-Host '$RGBackEndNic1 = New-AzureRmNetworkInterface ...'
+$RGBackEndNic1 = New-AzureRmNetworkInterface -ResourceGroupName $RG.ResourceGroupName -Name $BackEndNic1Name -Location $locName -PrivateIpAddress $BackEndPrivateIp1 -Subnet $RGBackEndSubnet -LoadBalancerBackendAddressPool $RGLoadBalancer.BackendAddressPools[0] -LoadBalancerInboundNatRule $RGLoadBalancer.InboundNatRules[0]
+$BackEndNic2Name = "cmpsbackendnic2"
+$BackEndPrivateIp2 = "10.0.0.7"
+Write-Host '$RGBackEndNic1 = New-AzureRmNetworkInterface ...'
+$RGBackEndNic1 = New-AzureRmNetworkInterface -ResourceGroupName $RG.ResourceGroupName -Name $BackEndNic2Name -Location $locName -PrivateIpAddress $BackEndPrivateIp2 -Subnet $RGBackEndSubnet -LoadBalancerBackendAddressPool $RGLoadBalancer.BackendAddressPools[0] -LoadBalancerInboundNatRule $RGLoadBalancer.InboundNatRules[1]
+
+$RGBackEndNic1
 # ----- Create a Load Balancer ----- end
 
 
@@ -91,7 +121,8 @@ $myVm = Set-AzureRmVMOperatingSystem -VM $myVm -Windows -ComputerName $vmName -C
 $myVm = Set-AzureRmVMSourceImage -VM $myVm -PublisherName "MicrosoftWindowsServer" -Offer "WindowsServer" -Skus "2016-Datacenter" -Version "latest"
 
 # 5. Add the network interface that you created to the configuration.
-
+# Trying to use load balancer as network interface
+#$myVm = Add-AzureRmVMNetworkInterface -vm $myVm -id $RGLoadBalancer.Id
 $myVm = Add-AzureRmVMNetworkInterface -vm $myVm -id $RGBackEndNic1.Id
 
 # 6. Define the name and location of the VM hard disk. The virtual hard disk file is stored in a container. This command creates the disk in a container named vhds/myOsDisk1.vhd in the storage account that you created.
@@ -105,31 +136,5 @@ $myVm = Set-AzureRmVMOSDisk -VM $myVm -Name "myOsDisk1" -VhdUri $osDiskUri -Crea
 new-azureRmVm -ResourceGroupName $RG.ResourceGroupName -Location $locName -VM $myVm 
 # ----- Create a virtual machine ----- end
 
-# Next step is to add the second vm to the second nic, and then scale the code to work for n instances.
 
 Write-Host "Done."
-# SIG # Begin signature block
-# MIIEMwYJKoZIhvcNAQcCoIIEJDCCBCACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
-# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVWbylRPfQUATZ4q1qI0/27qY
-# f0agggI9MIICOTCCAaagAwIBAgIQXqngHMtFJZBLvtKB5kMYmzAJBgUrDgMCHQUA
-# MCwxKjAoBgNVBAMTIVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdDAe
-# Fw0xNzAyMDkxNzU3NDBaFw0zOTEyMzEyMzU5NTlaMBoxGDAWBgNVBAMTD1Bvd2Vy
-# U2hlbGwgVXNlcjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAxJMXSX2yDza4
-# YoV7fYGLG+XE5KuXS17haubcZNNb85RbiguXlg8mOViEUalyEcEPdY5xfR1b62K7
-# Jt3J82RlEfwnVtmin5EXW3hYOYRP87U/pkKiq1MHULcmKO2kReTQmMtJB7Lw7HMB
-# g7bsaQzkOqzbgL38cMaowb/Kjo+VR+MCAwEAAaN2MHQwEwYDVR0lBAwwCgYIKwYB
-# BQUHAwMwXQYDVR0BBFYwVIAQO7kzIfSp327hSz/mt29jcKEuMCwxKjAoBgNVBAMT
-# IVBvd2VyU2hlbGwgTG9jYWwgQ2VydGlmaWNhdGUgUm9vdIIQrgjaQlc+9IhF3X9o
-# nylYgTAJBgUrDgMCHQUAA4GBAAy7KZBYUA9VbxygZSoCQVZnjgDjcu5tmHnWxqhD
-# OS2ZuMoMH38IO1D9fgqc2dvSANyVtvZ9KLPZcBvbos1yprogGvAIHZ5S2LEHvE1f
-# cB8ygMkqEmCddMeT7nJx0rU5wUaG8FMB44nA676kC33HIabLVc1CQq7oU0JbR5BO
-# j8IcMYIBYDCCAVwCAQEwQDAsMSowKAYDVQQDEyFQb3dlclNoZWxsIExvY2FsIENl
-# cnRpZmljYXRlIFJvb3QCEF6p4BzLRSWQS77SgeZDGJswCQYFKw4DAhoFAKB4MBgG
-# CisGAQQBgjcCAQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcC
-# AQQwHAYKKwYBBAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYE
-# FPejqu20rwdNne7Nr4+uk+CnKPEaMA0GCSqGSIb3DQEBAQUABIGALXBxgXTs2iBQ
-# McIl4wFdIrPTzVDzDefZUw2i1ycG0LJlnWqbv3diVDkG/X5fOyk65+cXjUADmDEo
-# Wv9vxky1EcuzjZKM/9HcDtUn1Z5KYjvOFuhbBQq3zRddoPOg9hEp2jtELJ599lXP
-# AbckN6qyeJkQJPVjTMWcb1gBV0k2NUA=
-# SIG # End signature block

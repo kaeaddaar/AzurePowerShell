@@ -83,41 +83,160 @@ function global:get-cmEnumResourceGroup # Returns the ResourceGroup selected
 
 <#
 .Synopsis
-   Enumerate an Array
+   Enumerate strings
 .DESCRIPTION
-   Enumerate an Array
+   Enumerate strings
 .EXAMPLE
-   Example of how to use this cmdlet
+   Example of how to use this cmdletget
 .EXAMPLE
    Another example of how to use this cmdlet
 #>
-function Enum-Array
+function global:Enum-String
 {
     [CmdletBinding()]
-    [Alias()]
-    [OutputType([int])]
+    [Alias("E-S")]
+    [OutputType([string])]
     Param
     (
         # Param1 help description
         [Parameter(Mandatory=$true,
                    ValueFromPipelineByPropertyName=$true,
+                   ValueFromPipeline=$true,
                    Position=0)]
-        [System.Array]
-        $Array,
-
-        # Param2 help description
         [String]
-        $PropertyName
+        $Name
     )
 
     Begin
     {
+        $Arr = New-Object System.Collections.ArrayList
+        $i = 0
     }
     Process
     {
+        $T = $Arr.Add(" " + $i + " " + $Name)
+        $i++        
     }
     End
     {
+        $Arr
+    }
+}
+
+
+<#
+.Synopsis
+   Get the nth Item
+.DESCRIPTION
+   Get the nth Item
+.EXAMPLE
+   Example of how to use this cmdletget
+.EXAMPLE
+   Another example of how to use this cmdlet
+#>
+function global:get-nthItem
+{
+    [CmdletBinding()]
+    [Alias("E-S")]
+    [OutputType([string])]
+    Param
+    (
+        # Param1 help description
+        [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   ValueFromPipeline=$true,
+                   Position=0)]
+        [String]
+        $Name
+    )
+
+    Begin
+    {
+        $Arr = New-Object System.Collections.ArrayList
+        $i = 0
+    }
+    Process
+    {
+        $T = $Arr.Add(" " + $i + " " + $Name)
+        $i++        
+    }
+    End
+    {
+        $Arr
+    }
+}
+
+
+<#
+.Synopsis
+   Enumerate strings
+.DESCRIPTION
+   Enumerate strings
+.EXAMPLE
+   Get-AzureRmVMImagePublisher -Location "westus2" | Select-Object -expandProperty PublisherName | Enum-String | Format-Columnnize -ColumnNum 3
+.EXAMPLE
+    $Array1 = "One", "Two", "Three", "Four", "Five", "Six", "Seven"
+    $Array1 | Enum-String | Format-Columnnize -ColumnNum 3
+Results:
+    Col0     Col1    Col2    
+    ----     ----    ----    
+     0 One    1 Two   2 Three
+     3 Four   4 Five  5 Six  
+     6 Seven                 
+#>
+function global:Format-Columnnize
+{
+    [CmdletBinding()]
+    [Alias("F-C")]
+    [OutputType([string])]
+    Param
+    (
+        # Name is the default column to match by for piping
+        [Parameter(Mandatory=$true,
+                   ValueFromPipelineByPropertyName=$true,
+                   ValueFromPipeline=$true,
+                   Position=1)]
+        [String]
+        $Name,
+
+        # ColumnNum is the number of columns you want to use in the table
+        [Parameter(Mandatory=$true,
+                   Position=0)]
+        $ColumnNum
+
+    )
+
+    Begin
+    {
+        $Arr = New-Object System.Collections.ArrayList
+        $Row = New-Object psobject
+        $i = 0
+        $i2 = 0
+    }
+    Process
+    {
+        if ($i2 -ge $ColumnNum) 
+        {
+            $i2 = 0
+            $T = $Arr.Add($Row)
+            $Row = New-Object psobject
+        }
+        Add-Member -InputObject $Row -MemberType NoteProperty -Name "Col$i2" -Value $Name
+        $i2++
+        $i++        
+    }
+    End
+    {
+        While ($i2 -lt $ColumnNum)
+        {
+            Add-Member -InputObject $Row -MemberType NoteProperty -Name "Col$i2" -Value ""
+            $i2++
+        }
+        if ($i2 = $ColumnNum) 
+        { 
+            $T = $Arr.Add($Row)
+        }
+        $Arr
     }
 }
 

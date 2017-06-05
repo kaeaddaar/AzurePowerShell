@@ -116,8 +116,9 @@ function global:New-cmStorageAccount ([Parameter(Mandatory=$true)] [String]$RGNa
 
 
 # ----- New-cmVNet -----
+# This function just does the vnet and subnet pieces in one shot
 
-Function global:New-cmVNet 
+Function global:New-cmVNet
 {
     Param
     (   
